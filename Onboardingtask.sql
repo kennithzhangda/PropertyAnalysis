@@ -62,7 +62,7 @@ WHERE op.OwnerId = '1426'
 
 
 --Expence Report
-SELECT pe.Description AS Expense, pe.Amount, CAST(pe.Date AS DATE) AS Date
+SELECT pe.Description AS Expense, CAST(pe.Amount AS INT), CONCAT(a.Number, ' ', a.Street) AS Address, CAST(pe.Date AS DATE) AS Date, ps.FirstName AS CurrentOwner, p.Bedroom, p.Bathroom, tpf.Name AS Frequency
 FROM [dbo].[Property] AS p
 INNER JOIN [dbo].[OwnerProperty] AS op
 ON p.Id = op.PropertyId
@@ -70,4 +70,10 @@ INNER JOIN [dbo].[Person] AS ps
 ON op.OwnerId = ps.Id
 INNER JOIN [dbo].[PropertyExpense] AS pe
 ON p.Id = pe.PropertyId
-WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'
+INNER JOIN [dbo].[Address] AS a
+ON p.AddressId = a.AddressId
+INNER JOIN [dbo].[PropertyRentalPayment] AS prp
+ON p.Id = prp.PropertyId
+INNER JOIN [dbo].[TenantPaymentFrequencies] AS tpf
+ON prp.FrequencyType = tpf.Id
+WHERE p.Name = 'Property A'

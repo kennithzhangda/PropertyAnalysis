@@ -16,7 +16,7 @@
     <DataSet Name="ExpenseReport_PropertyA">
       <Query>
         <DataSourceName>ExpenseReport</DataSourceName>
-        <CommandText>SELECT pe.Description AS Expense, pe.Amount, CAST(pe.Date AS DATE) AS Date
+        <CommandText>SELECT pe.Description AS Expense, CAST(pe.Amount AS INT) AS Amount, CONCAT(a.Number, ' ', a.Street) AS Address, CAST(pe.Date AS DATE) AS Date, ps.FirstName AS CurrentOwner, p.Bedroom, p.Bathroom, tpf.Name AS Frequency
 FROM [dbo].[Property] AS p
 INNER JOIN [dbo].[OwnerProperty] AS op
 ON p.Id = op.PropertyId
@@ -24,7 +24,13 @@ INNER JOIN [dbo].[Person] AS ps
 ON op.OwnerId = ps.Id
 INNER JOIN [dbo].[PropertyExpense] AS pe
 ON p.Id = pe.PropertyId
-WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
+INNER JOIN [dbo].[Address] AS a
+ON p.AddressId = a.AddressId
+INNER JOIN [dbo].[PropertyRentalPayment] AS prp
+ON p.Id = prp.PropertyId
+INNER JOIN [dbo].[TenantPaymentFrequencies] AS tpf
+ON prp.FrequencyType = tpf.Id
+WHERE p.Name = 'Property A'</CommandText>
       </Query>
       <Fields>
         <Field Name="Expense">
@@ -33,11 +39,31 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
         </Field>
         <Field Name="Amount">
           <DataField>Amount</DataField>
-          <rd:TypeName>System.Decimal</rd:TypeName>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="Address">
+          <DataField>Address</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
         <Field Name="Date">
           <DataField>Date</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="CurrentOwner">
+          <DataField>CurrentOwner</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Bedroom">
+          <DataField>Bedroom</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="Bathroom">
+          <DataField>Bathroom</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="Frequency">
+          <DataField>Frequency</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
         </Field>
       </Fields>
     </DataSet>
@@ -297,7 +323,7 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
             <Top>0.94051cm</Top>
             <Left>1.05833cm</Left>
             <Height>1.2cm</Height>
-            <Width>13.97347cm</Width>
+            <Width>13.97348cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -311,7 +337,7 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
       <Width>6.5in</Width>
       <Page>
         <PageHeader>
-          <Height>3.93347cm</Height>
+          <Height>4.16278cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -349,7 +375,13 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>             Current Owner: ABDC</Value>
+                      <Value>             Current Owner: </Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!CurrentOwner.Value</Value>
                       <Style>
                         <FontSize>8pt</FontSize>
                       </Style>
@@ -375,7 +407,13 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>             Property address: 123 Sample Address</Value>
+                      <Value>             Property address: </Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!Address.Value</Value>
                       <Style>
                         <FontSize>8pt</FontSize>
                       </Style>
@@ -401,7 +439,31 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>             Property details: 2 Bedrooms, 2 Bathrooms</Value>
+                      <Value>             Property details: </Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!Bedroom.Value</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value> Bedrooms, </Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!Bathroom.Value</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value> Bathrooms</Value>
                       <Style>
                         <FontSize>8pt</FontSize>
                       </Style>
@@ -427,7 +489,25 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>             Rental payment: $300 per week</Value>
+                      <Value>             Rental payment: $</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!Amount.Value</Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value xml:space="preserve">  </Value>
+                      <Style>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Fields!Frequency.Value</Value>
                       <Style>
                         <FontSize>8pt</FontSize>
                       </Style>
@@ -439,7 +519,7 @@ WHERE ps.FirstName = 'ABDC' OR ps.LastName = 'ABDC'</CommandText>
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox7</rd:DefaultName>
-              <Height>3.56306cm</Height>
+              <Height>4.02166cm</Height>
               <Width>16.51cm</Width>
               <Style>
                 <Border>
